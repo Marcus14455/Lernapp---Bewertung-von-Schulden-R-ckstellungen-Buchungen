@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>Lerntrainer – Bewertung von Verbindlichkeiten</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #0f172a;
+      background: #e5e7eb;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at top, #e5f0ff, #e5e7eb);
+    }
+
+    .app {
+      width: 100%;
+      max-width: 900px;
+      background: #f9fafb;
+      border-radius: 16px;
+      box-shadow: 0 18px 40px rgba(15,23,42,0.15);
+      padding: 24px;
+      box-sizing: border-box;
+    }
+
+    h1 {
+      margin: 0 0 4px;
+      font-size: 1.6rem;
+    }
+
+    .subtitle {
+      margin: 0 0 16px;
+      color: #6b7280;
+      font-size: 0.9rem;
+    }
+
+    .top-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .info {
+      font-size: 0.8rem;
+      color: #6b7280;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #e5e7eb;
+      font-size: 0.7rem;
+      margin-right: 4px;
+      margin-top: 4px;
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 8px 24px rgba(15,23,42,0.06);
+      margin-top: 10px;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .card-title {
+      font-weight: 600;
+      font-size: 1rem;
+    }
+
+    .card-sub {
+      font-size: 0.8rem;
+      color: #6b7280;
+    }
+
+    .question {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .answer-box {
+      border-radius: 10px;
+      padding: 12px 14px;
+      background: #ecfdf3;
+      border: 1px solid #bbf7d0;
+      color: #166534;
+      font-size: 0.95rem;
+      margin-top: 8px;
+    }
+
+    .distractors {
+      margin-top: 8px;
+      font-size: 0.9rem;
+      color: #4b5563;
+    }
+
+    .options {
+      display: grid;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .btn {
+      border: none;
+      outline: none;
+      cursor: pointer;
+      border-radius: 999px;
+      padding: 8px 16px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      background: #e5e7eb;
+      color: #111827;
+      transition: background 0.15s, transform 0.05s, box-shadow 0.15s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .btn:hover {
+      background: #d1d5db;
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.15) inset;
+    }
+
+    .btn-primary {
+      background: #2563eb;
+      color: #f9fafb;
+    }
+
+    .btn-primary:hover {
+      background: #1d4ed8;
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: #6b7280;
+    }
+
+    .btn-ghost:hover {
+      background: #e5e7eb;
+    }
+
+    .btn-correct {
+      background: #16a34a;
+      color: #ecfdf3;
+    }
+
+    .btn-incorrect {
+      background: #dc2626;
+      color: #fef2f2;
+    }
+
+    .footer-row {
+      margin-top: 16px;
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .tabs {
+      display: inline-flex;
+      padding: 3px;
+      border-radius: 999px;
+      background: #e5e7eb;
+    }
+
+    .tab {
+      border-radius: 999px;
+      padding: 6px 14px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      color: #6b7280;
+      font-weight: 500;
+    }
+
+    .tab-active {
+      background: #ffffff;
+      color: #111827;
+      box-shadow: 0 1px 4px rgba(15,23,42,0.15);
+    }
+
+    .status {
+      font-size: 0.8rem;
+      color: #6b7280;
+    }
+
+    .result {
+      margin-top: 12px;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .result.correct {
+      color: #16a34a;
+    }
+
+    .result.incorrect {
+      color: #dc2626;
+    }
+
+    @media (max-width: 640px) {
+      .app {
+        border-radius: 0;
+        height: 100vh;
+        max-width: 100%;
+      }
+      body {
+        align-items: stretch;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="top-row">
+      <div>
+        <h1>Lerntrainer – Fremdwährungsverbindlichkeiten</h1>
+        <p class="subtitle">
+          Stoff: Bewertung von Verbindlichkeiten nach HGB & Steuerrecht (Fremdwährung).
+        </p>
+      </div>
+      <div>
+        <div class="tabs">
+          <button class="tab tab-active" id="tab-cards">Karteikarten</button>
+          <button class="tab" id="tab-quiz">Quiz</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="info">
+      Tipp: Geh einmal alle Karten durch, dann wiederhole im Quiz-Modus.
+    </div>
+
+    <div id="cards-mode" class="card">
+      <div class="card-header">
+        <div class="card-title" id="cards-title"></div>
+        <div class="card-sub" id="cards-sub"></div>
+      </div>
+      <div class="question" id="cards-question"></div>
+      <div id="cards-tags"></div>
+      <div id="cards-answer-container"></div>
+      <div class="footer-row">
+        <div class="status" id="cards-status"></div>
+        <div>
+          <button class="btn btn-ghost" id="btn-prev-card">Zurück</button>
+          <button class="btn" id="btn-toggle-answer">Antwort zeigen</button>
+          <button class="btn btn-primary" id="btn-next-card">Weiter</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="quiz-mode" class="card" style="display:none;">
+      <div class="card-header">
+        <div class="card-title" id="quiz-title"></div>
+        <div class="card-sub" id="quiz-sub"></div>
+      </div>
+      <div class="question" id="quiz-question"></div>
+      <div id="quiz-tags"></div>
+      <div class="options" id="quiz-options"></div>
+      <div class="result" id="quiz-result"></div>
+      <div class="footer-row">
+        <div class="status" id="quiz-status"></div>
+        <div>
+          <button class="btn btn-ghost" id="btn-quiz-show-answer">Lösung einblenden</button>
+          <button class="btn btn-primary" id="btn-next-quiz">Nächste Frage</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const DATA = [
+      {
+        question: "Was bedeutet das Höchstwertprinzip bei Schulden?",
+        answer: "Schulden sind eher zu hoch als zu niedrig zu bewerten.",
+        distractors: [
+          "Schulden sind immer zum niedrigsten Wert anzusetzen",
+          "Schulden werden nicht bewertet",
+          "Nur Vermögen wird bewertet"
+        ],
+        tags: ["HGB", "Grundlagen"]
+      },
+      {
+        question: "Zu welchem Wert sind Verbindlichkeiten nach HGB anzusetzen?",
+        answer: "Zum Erfüllungsbetrag (§ 253 HGB)",
+        distractors: [
+          "Zum Anschaffungswert",
+          "Zum Marktwert",
+          "Zum Börsenkurs"
+        ],
+        tags: ["HGB"]
+      },
+      {
+        question: "Was gehört zum Erfüllungsbetrag von Verbindlichkeiten?",
+        answer: "Rückzahlungsbetrag bei Geldleistungen und voraussichtlicher Erfüllungsaufwand bei Sach- und Dienstleistungsverpflichtungen",
+        distractors: [
+          "Nur Rückzahlungsbetrag",
+          "Nur Aufwand",
+          "Nennwert ohne Anpassung"
+        ],
+        tags: ["HGB"]
+      },
+      {
+        question: "Wie sind Verbindlichkeiten steuerrechtlich anzusetzen?",
+        answer: "Mit Anschaffungskosten oder höherem Teilwert",
+        distractors: [
+          "Immer zum Erfüllungsbetrag",
+          "Immer zum niedrigeren Wert",
+          "Zum Marktwert"
+        ],
+        tags: ["Steuerrecht"]
+      },
+      {
+        question: "Wie werden Fremdwährungsverbindlichkeiten beim Zugang bewertet?",
+        answer: "Zum Devisenkassamittelkurs des Anschaffungstages",
+        distractors: [
+          "Zum Terminmarktpreis",
+          "Zum historischen Kurs",
+          "Zum Tageskurs des Bilanzstichtags"
+        ],
+        tags: ["HGB", "Fremdwährung", "Zugang"]
+      },
+      {
+        question: "Welche Bewertung gilt bei Fremdwährungsverbindlichkeiten mit Restlaufzeit > 1 Jahr am Bilanzstichtag?",
+        answer: "Vergleich Zugangskurs vs. Abschlusskurs; höherer Wert wird angesetzt (Höchstwertprinzip)",
+        distractors: [
+          "Immer Zugangskurs",
+          "Immer Tageskurs",
+          "Niedrigster Wert"
+        ],
+        tags: ["Handelsrecht", "Folgebewertung"]
+      },
+      {
+        question: "Welche Bewertung gilt bei Restlaufzeit ≤ 1 Jahr?",
+        answer: "Bewertung zum Devisenkassamittelkurs am Bilanzstichtag ohne Höchstwert- & Imparitätsprinzip",
+        distractors: [
+          "Nur Zugangskurs",
+          "Nur höherer Kurs",
+          "Durchschnittskurs"
+        ],
+        tags: ["HGB", "Folgebewertung"]
+      },
+      {
+        question: "Welches Prinzip gilt steuerlich für Fremdwährungsverbindlichkeiten?",
+        answer: "Anschaffungskostenprinzip; Erhöhung nur bei nachhaltiger Kursänderung",
+        distractors: [
+          "Höchstwertprinzip immer",
+          "Realisationsprinzip immer",
+          "Marktwertprinzip"
+        ],
+        tags: ["Steuerrecht"]
+      },
+      {
+        question: "Was ist der Devisenkassamittelkurs?",
+        answer: "Mittlerer Kurs zwischen Geld- und Briefkurs",
+        distractors: [
+          "Briefkurs",
+          "Geldkurs",
+          "Fixkurs"
+        ],
+        tags: ["Finanz", "Fremdwährung"]
+      },
+      {
+        question: "Wann entsteht ein Währungsverlust bei Fremdwährungsverbindlichkeiten?",
+        answer: "Wenn der Abschlusskurs höher ist als der ursprüngliche Kurs",
+        distractors: [
+          "Wenn der Kurs sinkt",
+          "Wenn der Euro stärker wird",
+          "Wenn Lieferanten früh zahlen"
+        ],
+        tags: ["Finanz", "Bewertung"]
+      },
+      {
+        question: "Wann entsteht ein Währungsgewinn?",
+        answer: "Wenn der Abschlusskurs niedriger ist als der ursprüngliche Kurs",
+        distractors: [
+          "Wenn der Kurs steigt",
+          "Immer bei Fremdwährungen",
+          "Nie"
+        ],
+        tags: ["Finanz", "Bewertung"]
+      }
+    ];
+
+    // Hilfsfunktionen
+    function shuffle(array) {
+      const a = array.slice();
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    // --- Karteikarten ---
+    let cardIndex = 0;
+    let showAnswer = false;
+
+    const cardsTitle = document.getElementById("cards-title");
+    const cardsSub = document.getElementById("cards-sub");
+    const cardsQuestion = document.getElementById("cards-question");
+    const cardsTags = document.getElementById("cards-tags");
+    const cardsAnswerContainer = document.getElementById("cards-answer-container");
+    const cardsStatus = document.getElementById("cards-status");
+
+    function renderCard() {
+      const item = DATA[cardIndex];
+      cardsTitle.textContent = "Karteikarte";
+      cardsSub.textContent = `Frage ${cardIndex + 1} von ${DATA.length}`;
+      cardsQuestion.textContent = item.question;
+      cardsTags.innerHTML = (item.tags || [])
+        .map(t => `<span class="tag">${t}</span>`)
+        .join("");
+
+      if (showAnswer) {
+        cardsAnswerContainer.innerHTML = `
+          <div class="answer-box">
+            <strong>Antwort:</strong><br>${item.answer}
+          </div>
+        `;
+      } else {
+        cardsAnswerContainer.innerHTML = `
+          <div class="distractors">
+            Überlege dir zunächst selbst die Antwort – oder schalte sie über den Button unten ein.
+          </div>
+        `;
+      }
+
+      cardsStatus.textContent = "";
+    }
+
+    document.getElementById("btn-next-card").addEventListener("click", () => {
+      cardIndex = (cardIndex + 1) % DATA.length;
+      showAnswer = false;
+      renderCard();
+    });
+
+    document.getElementById("btn-prev-card").addEventListener("click", () => {
+      cardIndex = (cardIndex - 1 + DATA.length) % DATA.length;
+      showAnswer = false;
+      renderCard();
+    });
+
+    document.getElementById("btn-toggle-answer").addEventListener("click", () => {
+      showAnswer = !showAnswer;
+      renderCard();
+      document.getElementById("btn-toggle-answer").textContent =
+        showAnswer ? "Antwort ausblenden" : "Antwort zeigen";
+    });
+
+    // --- Quiz ---
+    let quizIndex = 0;
+    let quizLocked = false;
+    let currentOptions = [];
+
+    const quizTitle = document.getElementById("quiz-title");
+    const quizSub = document.getElementById("quiz-sub");
+    const quizQuestion = document.getElementById("quiz-question");
+    const quizTags = document.getElementById("quiz-tags");
+    const quizOptions = document.getElementById("quiz-options");
+    const quizResult = document.getElementById("quiz-result");
+    const quizStatus = document.getElementById("quiz-status");
+
+    function renderQuiz() {
+      const item = DATA[quizIndex];
+      quizLocked = false;
+      quizResult.textContent = "";
+      quizResult.className = "result";
+      quizTitle.textContent = "Quizfrage";
+      quizSub.textContent = `Frage ${quizIndex + 1} von ${DATA.length}`;
+      quizQuestion.textContent = item.question;
+      quizTags.innerHTML = (item.tags || [])
+        .map(t => `<span class="tag">${t}</span>`)
+        .join("");
+
+      currentOptions = shuffle([item.answer, ...(item.distractors || [])]);
+      quizOptions.innerHTML = "";
+      currentOptions.forEach(opt => {
+        const btn = document.createElement("button");
+        btn.className = "btn";
+        btn.textContent = opt;
+        btn.addEventListener("click", () => {
+          if (quizLocked) return;
+          quizLocked = true;
+          const correct = opt === item.answer;
+          if (correct) {
+            btn.className = "btn btn-correct";
+            quizResult.textContent = "Richtig! ✅";
+            quizResult.classList.add("correct");
+          } else {
+            btn.className = "btn btn-incorrect";
+            quizResult.textContent = "Falsch. Richtig wäre: " + item.answer;
+            quizResult.classList.add("incorrect");
+          }
+        });
+        quizOptions.appendChild(btn);
+      });
+
+      quizStatus.textContent = "";
+    }
+
+    document.getElementById("btn-next-quiz").addEventListener("click", () => {
+      quizIndex = (quizIndex + 1) % DATA.length;
+      renderQuiz();
+    });
+
+    document.getElementById("btn-quiz-show-answer").addEventListener("click", () => {
+      const item = DATA[quizIndex];
+      quizResult.textContent = "Lösung: " + item.answer;
+      quizResult.className = "result correct";
+      quizLocked = true;
+    });
+
+    // --- Tabs ---
+    const tabCards = document.getElementById("tab-cards");
+    const tabQuiz = document.getElementById("tab-quiz");
+    const cardsMode = document.getElementById("cards-mode");
+    const quizMode = document.getElementById("quiz-mode");
+
+    tabCards.addEventListener("click", () => {
+      tabCards.classList.add("tab-active");
+      tabQuiz.classList.remove("tab-active");
+      cardsMode.style.display = "block";
+      quizMode.style.display = "none";
+    });
+
+    tabQuiz.addEventListener("click", () => {
+      tabQuiz.classList.add("tab-active");
+      tabCards.classList.remove("tab-active");
+      cardsMode.style.display = "none";
+      quizMode.style.display = "block";
+      renderQuiz();
+    });
+
+    // Initial
+    renderCard();
+  </script>
+</body>
+</html>
